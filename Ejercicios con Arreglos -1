@@ -1,0 +1,60 @@
+using System;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numeros = new int[10];
+        Console.WriteLine("Ingrese 10 números enteros:");
+        for (int i = 0; i < 10; i++) numeros[i] = int.Parse(Console.ReadLine());
+
+        // Ejercicio 3: Posición del mayor número primo
+        int mayorPrimo = -1, posMayorPrimo = -1;
+        for (int i = 0; i < 10; i++)
+        {
+            if (EsPrimo(numeros[i]) && numeros[i] > mayorPrimo)
+            {
+                mayorPrimo = numeros[i];
+                posMayorPrimo = i;
+            }
+        }
+        Console.WriteLine($"Posición del mayor número primo: {posMayorPrimo}");
+
+        // Ejercicio 4: Cantidad de números que comienzan con dígito primo
+        int countDigitoPrimo = numeros.Count(n => "2357".Contains(n.ToString()[0]));
+        Console.WriteLine($"Cantidad de números que comienzan con dígito primo: {countDigitoPrimo}");
+
+        // Ejercicio 5: Posición del primo con más dígitos pares
+        int maxPares = -1, posMaxPares = -1;
+        for (int i = 0; i < 10; i++)
+        {
+            if (EsPrimo(numeros[i]))
+            {
+                int pares = numeros[i].ToString().Count(c => "02468".Contains(c));
+                if (pares > maxPares)
+                {
+                    maxPares = pares;
+                    posMaxPares = i;
+                }
+            }
+        }
+        Console.WriteLine($"Posición del primo con más dígitos pares: {posMaxPares}");
+
+        // Ejercicio 6: Posiciones de números con más de 3 dígitos
+        var posiciones = numeros.Select((n, i) => n.ToString().Length > 3 ? i.ToString() : null).Where(x => x != null);
+        Console.WriteLine("Posiciones de números con más de 3 dígitos: " + string.Join(", ", posiciones));
+
+        // Ejercicio 7: Promedio entero del arreglo
+        int promedio = numeros.Sum() / 10;
+        Console.WriteLine($"Promedio entero: {promedio}");
+    }
+
+    static bool EsPrimo(int n)
+    {
+        if (n < 2) return false;
+        for (int i = 2; i * i <= n; i++)
+            if (n % i == 0) return false;
+        return true;
+    }
+}
