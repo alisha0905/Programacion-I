@@ -1,0 +1,51 @@
+using System;
+
+class Motor {
+    public int LitrosDeAceite { get; private set; } = 0;
+    public int Potencia { get; }
+    public Motor(int potencia) => Potencia = potencia;
+    public void AgregarAceite() => LitrosDeAceite += 10;
+}
+
+class Coche {
+    public string Marca { get; }
+    public string Modelo { get; }
+    public double PrecioAverias { get; private set; } = 0;
+    public Motor Motor { get; }
+    public Coche(string marca, string modelo, int potencia) {
+        Marca = marca; Modelo = modelo; Motor = new Motor(potencia);
+    }
+    public void AcumularAveria(double costo) => PrecioAverias += costo;
+    public override string ToString() => $"{Marca} {Modelo} | Potencia: {Motor.Potencia} CV | Aceite: {Motor.LitrosDeAceite} L | Costo Averías: {PrecioAverias:C}";
+}
+
+class Garaje {
+    private Coche cocheActual;
+    public bool AceptarCoche(Coche coche, string averia) {
+        if (cocheActual != null) return false;
+        cocheActual = coche;
+        coche.AcumularAveria(new Random().NextDouble() * 500);
+        if (averia.ToLower() == "aceite") coche.Motor.AgregarAceite();
+        return true;
+    }
+    public void DevolverCoche() => cocheActual = null;
+}
+
+class PracticaPOO {
+    static void Main() {
+        Garaje garaje = new();
+        Coche coche1 = new("Toyota", "Corolla", 120);
+        Coche coche2 = new("Honda", "Civic", 140);
+        string[] averias = {"aceite", "frenos", "motor", "transmisión"};
+        Random random = new();
+
+        for (int i = 0; i < 2; i++) {
+            while (!garaje.AceptarCoche(coche1, averias[random.Next(averias.Length)]));
+            garaje.DevolverCoche();
+            while (!garaje.AceptarCoche(coche2, averias[random.Next(averias.Length)]));
+            garaje.DevolverCoche();
+        }
+        Console.WriteLine(coche1);
+        Console.WriteLine(coche2);
+    }
+}
