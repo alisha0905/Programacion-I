@@ -1,0 +1,74 @@
+using System;
+
+// Clase base
+public class Ave
+{
+    public string Nombre { get; set; }
+    public string Color { get; set; }
+    
+    public Ave(string nombre, string color)
+    {
+        Nombre = nombre;
+        Color = color;
+    }
+    
+    public virtual void Volar()
+    {
+        Console.WriteLine("Esta ave puede volar.");
+    }
+    
+    public virtual void HacerSonido()
+    {
+        Console.WriteLine("Esta ave hace un sonido genérico.");
+    }
+}
+
+// Clase derivada Cigua Palmera
+public class CiguaPalmera : Ave
+{
+    public CiguaPalmera(string nombre, string color) : base(nombre, color) {}
+
+    public override void Volar()
+    {
+        Console.WriteLine("La cigua palmera vuela con movimientos ágiles entre las palmeras.");
+    }
+    
+    public override void HacerSonido()
+    {
+        Console.WriteLine("La cigua palmera emite un canto distintivo y melodioso.");
+    }
+}
+
+// Clase derivada Paloma
+public class Paloma : Ave
+{
+    public Paloma(string nombre, string color) : base(nombre, color) {}
+
+    public override void Volar()
+    {
+        Console.WriteLine("La paloma vuela de manera rápida y constante.");
+    }
+    
+    public override void HacerSonido()
+    {
+        Console.WriteLine("La paloma emite un arrullo característico.");
+    }
+}
+
+// Programa principal
+class Program
+{
+    static void Main()
+    {
+        Ave miCigua = new CiguaPalmera("Cigua Palmera", "Marrón y blanco");
+        Ave miPaloma = new Paloma("Paloma Común", "Gris");
+        
+        miCigua.Volar();
+        miCigua.HacerSonido();
+        
+        Console.WriteLine();
+        
+        miPaloma.Volar();
+        miPaloma.HacerSonido();
+    }
+}
