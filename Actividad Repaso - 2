@@ -1,0 +1,58 @@
+using System;
+
+// Clase base Autobus
+abstract class Autobus
+{
+    public string Modelo { get; set; }
+    public int MaxPasajeros { get; set; }
+    public int Ocupados { get; set; }
+    public int Tarifa { get; set; }
+
+    public Autobus(string modelo, int maxPasajeros, int tarifa)
+    {
+        Modelo = modelo;
+        MaxPasajeros = maxPasajeros;
+        Tarifa = tarifa;
+        Ocupados = 0;
+    }
+
+    public virtual void RegistrarVenta(int cantidad)
+    {
+        if (Ocupados + cantidad <= MaxPasajeros)
+        {
+            Ocupados += cantidad;
+            Console.WriteLine($"{Modelo}: {Ocupados} pasajeros. Ingresos: {Ocupados * Tarifa}. Asientos restantes: {MaxPasajeros - Ocupados}");
+        }
+        else
+        {
+            Console.WriteLine($"No hay suficientes asientos libres en {Modelo}.");
+        }
+    }
+}
+
+// Clases derivadas de Autobus
+class AutobusVIP : Autobus
+{
+    public AutobusVIP() : base("Autobus VIP", 22, 1000) { }
+}
+
+class AutobusEstandar : Autobus
+{
+    public AutobusEstandar() : base("Autobus Estándar", 15, 1200) { }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Autobus> flota = new List<Autobus>
+        {
+            new AutobusVIP(),
+            new AutobusEstandar()
+        };
+
+        // Simulación de ventas
+        flota[0].RegistrarVenta(5); // Autobus VIP vende 5 pasajes
+        flota[1].RegistrarVenta(3); // Autobus Estándar vende 3 pasajes
+    }
+}
