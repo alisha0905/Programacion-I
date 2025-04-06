@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+
+// Clase Ingrediente
+class Ingrediente
+{
+    public string Nombre { get; }
+    public double Precio { get; }
+
+    public Ingrediente(string nombre, double precio)
+    {
+        Nombre = nombre;
+        Precio = precio;
+    }
+}
+
+// Clase base Hamburguesa
+class Hamburguesa
+{
+    protected string tipoPan;
+    protected string tipoCarne;
+    protected double precioBase;
+    protected List<Ingrediente> adicionales;
+    protected int maxAdicionales = 4;
+
+    public Hamburguesa(string tipoPan, string tipoCarne, double precioBase)
+    {
+        this.tipoPan = tipoPan;
+        this.tipoCarne = tipoCarne;
+        this.precioBase = precioBase;
+        this.adicionales = new List<Ingrediente>();
+    }
+
+    public virtual void AgregarIngrediente(string nombre, double precio)
+    {
+        if (adicionales.Count < maxAdicionales)
+        {
+            adicionales.Add(new Ingrediente(nombre, precio));
+        }
+        else
+        {
+            Console.WriteLine("❌ No se pueden agregar más ingredientes.");
+        }
+    }
+
+    public virtual void MostrarDetalle()
+    {
+        Console.WriteLine($"\n🍔 Hamburguesa ({tipoCarne} en pan {tipoPan})");
+        Console.WriteLine($"Precio base: ${precioBase:F2}");
+        double total = precioBase;
+
+        foreach (var ingrediente in adicionales)
+        {
+            Console.WriteLine($" + {ingrediente.Nombre}: ${ingrediente.Precio:F2}");
+            total += ingrediente.Precio;
+        }
+
+        Console.WriteLine($"TOTAL: ${total:F2}\n");
+    }
+}
+
+// Clase Hamburguesa Saludable
+class HamburguesaSaludable : Hamburguesa
+{
+    private List<Ingrediente> adicionalesSaludables;
+
+    public HamburguesaSaludable(string tipoCarne, double precioBase)
+        : base("Pan Integral", tipoCarne, precioBase)
+    {
+        this.maxAdicionales = 6;
+        adicionalesSaludables = new List<Ingrediente>();
+    }
+
+    public override void AgregarIngrediente(string nombre, double precio)
+    {
+        if (adicionalesSaludables.Count < maxAdicionales)
+        {
+            adicionalesSaludables.Add(new Ingrediente(nombre, precio));
+        }
+        else
+        {
+            Console.WriteLine("❌ No se pueden agregar más ingredientes saludables.");
+        }
+    }
+
+    public override void MostrarDetalle()
+    {
+        Console.WriteLine($"\n🥗 Hamburguesa Saludable ({tipoCarne} en {tipoPan})");
+        Console.WriteLine($"Precio base: ${precioBase:F2}");
+        double total = precioBase;
+
+        foreach (var ingrediente in adicionalesSaludables)
+        {
+            Console.WriteLine($" + {ingrediente.Nombre}: ${ingrediente.Precio:F2}");
+            total += ingrediente.Precio;
+        }
+
+        Console.WriteLine($"TOTAL: ${total:F2}\n");
+    }
+}
+
+// Clase Hamburguesa Premium
+class HamburguesaPremium : Hamburguesa
+{
+    public HamburguesaPremium(string tipoPan, string tipoCarne, double precioBase)
+        : base(tipoPan, tipoCarne, precioBase)
+    {
+        // Se agregan automáticamente papitas y bebida
+        adicionales.Add(new Ingrediente("Papitas", 2.50));
+        adicionales.Add(new Ingrediente("Bebida", 1.75));
+    }
+
+    public override void AgregarIngrediente(string nombre, double precio)
+    {
+        Console.WriteLine("❌ No se pueden agregar más ingredientes a la hamburguesa premium.");
+    }
+
+    public override void MostrarDetalle()
+    {
+        Console.WriteLine($"\n🍟 Hamburguesa Premium ({tipoCarne} en {tipoPan})");
+        Console.WriteLine($"Precio base: ${precioBase:F2}");
+        double total = precioBase;
+
+        foreach (var ingrediente in adicionales)
+        {
+            Console.WriteLine($" + {ingrediente.Nombre}: ${ingrediente.Precio:F2}");
+            total += ingrediente.Precio;
+        }
+
+        Console.WriteLine($"TOTAL: ${total:F2}\n");
+    }
+}
+
+// Método Main (punto de entrada)
+class Program
+{
+    static void Main()
+    {
+        var clasica = new Hamburguesa("Blanco", "Res", 5.00);
+        clasica.AgregarIngrediente("Lechuga", 0.50);
+        clasica.AgregarIngrediente("Tomate", 0.50);
+        clasica.AgregarIngrediente("Bacon", 1.00);
+        clasica.MostrarDetalle();
+
+        var saludable = new HamburguesaSaludable("Pollo", 6.00);
+        saludable.AgregarIngrediente("Aguacate", 1.00);
+        saludable.AgregarIngrediente("Espinaca", 0.75);
+        saludable.AgregarIngrediente("Tomate", 0.50);
+        saludable.MostrarDetalle();
+
+        var premium = new HamburguesaPremium("Brioche", "Angus", 8.00);
+        premium.AgregarIngrediente("Bacon", 1.00); // Esto no debería permitir
+        premium.MostrarDetalle();
+    }
+}
