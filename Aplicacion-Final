@@ -1,0 +1,221 @@
+using System;
+using System.Collections.Generic;
+
+namespace CineReservas
+{
+    // Clase base Persona
+    class Persona
+    {
+        public string Nombre { get; set; }
+
+        public Persona(string nombre)
+        {
+            Nombre = nombre;
+        }
+
+        public virtual void MostrarInformacion()
+        {
+            Console.WriteLine($"Nombre: {Nombre}");
+        }
+    }
+
+    // Clase Cliente que hereda de Persona
+    class Cliente : Persona
+    {
+        public Cliente(string nombre) : base(nombre) { }
+
+        public override void MostrarInformacion()
+        {
+            Console.WriteLine($"Cliente: {Nombre}");
+        }
+    }
+
+    class Pelicula
+    {
+        public string Titulo { get; set; }
+        public int Duracion { get; set; }
+        public string Genero { get; set; }
+
+        public Pelicula(string titulo, int duracion, string genero)
+        {
+            Titulo = titulo;
+            Duracion = duracion;
+            Genero = genero;
+        }
+    }
+
+    class Sala
+    {
+        public int NumeroSala { get; set; }
+        public bool[] Asientos { get; set; }
+
+        public Sala(int numeroSala, int capacidad)
+        {
+            NumeroSala = numeroSala;
+            Asientos = new bool[capacidad];
+        }
+
+        public void MostrarAsientos()
+        {
+            Console.WriteLine($"Sala {NumeroSala} - Asientos:");
+            for (int i = 0; i < Asientos.Length; i++)
+            {
+                Console.Write(Asientos[i] ? "[X]" : $"[{i}]");
+                if ((i + 1) % 10 == 0) Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+    }
+
+    class Funcion
+    {
+        public Pelicula Pelicula { get; set; }
+        public Sala Sala { get; set; }
+        public DateTime FechaHora { get; set; }
+        public string Sucursal { get; set; }
+
+        public Funcion(Pelicula pelicula, Sala sala, DateTime fechaHora, string sucursal)
+        {
+            Pelicula = pelicula;
+            Sala = sala;
+            FechaHora = fechaHora;
+            Sucursal = sucursal;
+        }
+    }
+
+    class Reserva
+    {
+        public Funcion Funcion { get; set; }
+        public Cliente Cliente { get; set; }
+        public List<int> AsientosReservados { get; set; }
+        public string NumeroConfirmacion { get; set; }
+
+        public Reserva(Funcion funcion, Cliente cliente, List<int> asientos)
+        {
+            Funcion = funcion;
+            Cliente = cliente;
+            AsientosReservados = asientos;
+            NumeroConfirmacion = Guid.NewGuid().ToString().Substring(0, 8);
+
+            foreach (int asiento in asientos)
+                Funcion.Sala.Asientos[asiento] = true;
+        }
+
+        public void MostrarReserva()
+        {
+            Console.WriteLine("\n--- TICKET DE RESERVA ---");
+            Cliente.MostrarInformacion();
+            Console.WriteLine($"Película: {Funcion.Pelicula.Titulo}");
+            Console.WriteLine($"Género: {Funcion.Pelicula.Genero}");
+            Console.WriteLine($"Duración: {Funcion.Pelicula.Duracion} min");
+            Console.WriteLine($"Sucursal: {Funcion.Sucursal}");
+            Console.WriteLine($"Sala: {Funcion.Sala.NumeroSala}");
+            Console.WriteLine($"Fecha y hora: {Funcion.FechaHora}");
+            Console.WriteLine("Asientos: " + string.Join(", ", AsientosReservados));
+            Console.WriteLine($"Número de confirmación: {NumeroConfirmacion}");
+            Console.WriteLine("----------------------------\n");
+        }
+    }
+
+    class Cine
+    {
+        public List<Pelicula> Peliculas = new();
+        public List<Funcion> Funciones = new();
+        public List<Reserva> Reservas = new();
+
+        public void AgregarPelicula(Pelicula p) => Peliculas.Add(p);
+        public void AgregarFuncion(Funcion f) => Funciones.Add(f);
+
+        public void MostrarCartelera()
+        {
+            Console.WriteLine("--- Cartelera ---");
+            for (int i = 0; i < Peliculas.Count; i++)
+            {
+                Console.WriteLine($"[{i}] {Peliculas[i].Titulo} - {Peliculas[i].Genero} - {Peliculas[i].Duracion} min");
+            }
+        }
+
+        public void MostrarTandas()
+        {
+            Console.WriteLine("Horarios disponibles: [1] 6:00 PM | [2] 8:00 PM | [3] 10:00 PM");
+        }
+
+        public void ReservarAsiento(Funcion funcion, Cliente cliente, List<int> asientos)
+        {
+            var reserva = new Reserva(funcion, cliente, asientos);
+            Reservas.Add(reserva);
+            reserva.MostrarReserva();
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Cine cine = new Cine();
+
+            var p1 = new Pelicula("Barbie: poder de sirena", 90, "Animación");
+            var p2 = new Pelicula("Barbie: Big City, Big Dreams", 85, "Musical");
+            var p3 = new Pelicula("Barbie y Chelsea, el cumpleaños perdido", 60, "Infantil");
+            var p4 = new Pelicula("Barbie: Aventuras de una princesa", 75, "Fantasía");
+            var p5 = new Pelicula("Barbie Dreamtopia: Festival de diversión", 70, "Aventura");
+            var sala1 = new Sala(1, 30);
+
+            cine.AgregarPelicula(p1);
+            cine.AgregarPelicula(p2);
+            cine.AgregarPelicula(p3);
+            cine.AgregarPelicula(p4);
+            cine.AgregarPelicula(p5);
+
+            string[] sucursales = { "Kennedy", "27 de Febrero", "Ciudad Juan Bosch" };
+            DateTime hoy = DateTime.Today;
+            foreach (var sucursal in sucursales)
+            {
+                foreach (var pelicula in cine.Peliculas)
+                {
+                    cine.AgregarFuncion(new Funcion(pelicula, sala1, hoy.AddHours(18), sucursal));
+                    cine.AgregarFuncion(new Funcion(pelicula, sala1, hoy.AddHours(20), sucursal));
+                    cine.AgregarFuncion(new Funcion(pelicula, sala1, hoy.AddHours(22), sucursal));
+                }
+            }
+
+            cine.MostrarCartelera();
+            Console.Write("Seleccione una película [0-...]: ");
+            int peliculaIndex = int.Parse(Console.ReadLine());
+            var peliculaSeleccionada = cine.Peliculas[peliculaIndex];
+
+            Console.WriteLine("Seleccione una sucursal:");
+            for (int i = 0; i < sucursales.Length; i++)
+                Console.WriteLine($"[{i}] {sucursales[i]}");
+            Console.Write("Sucursal: ");
+            int sucursalIndex = int.Parse(Console.ReadLine());
+            string sucursalElegida = sucursales[sucursalIndex];
+
+            cine.MostrarTandas();
+            Console.Write("Seleccione tanda [1-3]: ");
+            int tandaOpcion = int.Parse(Console.ReadLine());
+            DateTime hora = tandaOpcion switch
+            {
+                1 => hoy.AddHours(18),
+                2 => hoy.AddHours(20),
+                3 => hoy.AddHours(22),
+                _ => hoy.AddHours(18)
+            };
+
+            var funcionSeleccionada = cine.Funciones.Find(f => f.Pelicula == peliculaSeleccionada && f.FechaHora == hora && f.Sucursal == sucursalElegida);
+
+            funcionSeleccionada.Sala.MostrarAsientos();
+
+            Console.Write("Nombre del cliente: ");
+            string nombre = Console.ReadLine();
+            Cliente cliente = new Cliente(nombre);
+
+            Console.Write("Ingrese los asientos separados por coma (ej: 0,1,2): ");
+            var input = Console.ReadLine().Split(',');
+            var asientos = new List<int>();
+            foreach (var a in input) asientos.Add(int.Parse(a.Trim()));
+
+            cine.ReservarAsiento(funcionSeleccionada, cliente, asientos);
+        }
+    }
+}
